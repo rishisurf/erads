@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #050505;
+  --bg-secondary: #0a0a0a;
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --border-primary: #333333;
+  --border-secondary: #222222;
+  --grid-color: #1a1a1a;
+
+  font-family: 'JetBrains Mono', 'Inter', system-ui, -apple-system, monospace;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base grid implementation */
+.bg-grid {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+}
+
+/* Brutalist utilities */
+.border-b-brutal {
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.border-brutal {
+  border: 1px solid var(--border-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Input reset */
+input,
+select,
+textarea {
+  background: black;
+  border: 1px solid var(--border-primary);
+  color: white;
+  padding: 0.5rem;
+  font-family: inherit;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: white;
+}
+
+/* Selection */
+::selection {
+  background: white;
+  color: black;
+}
