@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Key, BarChart3, ShieldAlert, Cpu, Settings } from 'lucide-react';
+import { LayoutDashboard, Key, BarChart3, ShieldAlert, Cpu, Settings, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface LayoutProps {
@@ -44,6 +44,16 @@ export function Layout({ children }: LayoutProps) {
                 </nav>
 
                 <div className="p-6 border-t border-[#333]">
+                    <button
+                        onClick={() => {
+                            sessionStorage.removeItem('erads_admin_secret');
+                            window.location.reload();
+                        }}
+                        className="flex items-center text-[#666] hover:text-white text-xs mb-4 cursor-pointer"
+                    >
+                        <LogOut className="w-3 h-3 mr-2" />
+                        SIGN OUT
+                    </button>
                     <div className="text-[10px] text-[#444] leading-relaxed">
                         SYSTEM STATUS: ONLINE<br />
                         VERSION: 1.0.0<br />

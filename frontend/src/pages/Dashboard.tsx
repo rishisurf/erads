@@ -30,14 +30,11 @@ export default function Dashboard() {
     if (loading && !stats) return <div className="text-xs text-[#888] animate-pulse">BOOTING SYSTEM...</div>;
     if (error) return <div className="text-xs text-red-500 border border-red-900 p-4">SYSTEM ERROR: {error}</div>;
 
-    // Mock data for chart since backend stats are aggregated for now
-    // In a real app we'd fetch timeseries data
-    const mockChartData = [
-        { time: '00:00', reqs: 120 }, { time: '04:00', reqs: 180 },
-        { time: '08:00', reqs: 450 }, { time: '12:00', reqs: 890 },
-        { time: '16:00', reqs: 670 }, { time: '20:00', reqs: 340 },
-        { time: '23:59', reqs: 210 }
-    ];
+    // Format timeseries data for the chart
+    const chartData = (stats?.timeSeries || []).map(item => ({
+        time: new Date(item.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        requests: item.requests,
+    }));
 
     return (
         <div className="space-y-6">
@@ -79,21 +76,27 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-2 min-h-[400px]">
-                    <CardHeader title="TRAFFIC VOLUME" description="REQUESTS PER HOUR" />
+                    <CardHeader title="TRAFFIC VOLUME" description="REQUESTS PER HOUR (LIVE)" />
                     <div className="h-[300px] w-full mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={mockChartData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
-                                <XAxis dataKey="time" stroke="#444" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#444" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #333' }}
-                                    itemStyle={{ color: '#fff', fontSize: '12px', fontFamily: 'monospace' }}
-                                    labelStyle={{ display: 'none' }}
-                                />
-                                <Area type="step" dataKey="reqs" stroke="#fff" strokeWidth={1} fill="rgba(255,255,255,0.05)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                        {chartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
+                                    <XAxis dataKey="time" stroke="#444" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#444" fontSize={12} tickLine={false} axisLine={false} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#000', border: '1px solid #333' }}
+                                        itemStyle={{ color: '#fff', fontSize: '12px', fontFamily: 'monospace' }}
+                                        labelStyle={{ display: 'none' }}
+                                    />
+                                    <Area type="step" dataKey="requests" stroke="#fff" strokeWidth={1} fill="rgba(255,255,255,0.05)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-[#444] text-sm">
+                                NO TRAFFIC DATA YET
+                            </div>
+                        )}
                     </div>
                 </Card>
 

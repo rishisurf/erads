@@ -1,12 +1,22 @@
 import type { Stats, ApiKey, CreateKeyResponse, Ban } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/v1';
+const AUTH_STORAGE_KEY = 'erads_admin_secret';
+
+function getAuthHeaders(): Record<string, string> {
+    const secret = sessionStorage.getItem(AUTH_STORAGE_KEY);
+    if (secret) {
+        return { 'Authorization': `Bearer ${secret}` };
+    }
+    return {};
+}
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const res = await fetch(`${API_BASE}${endpoint}`, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
+            ...getAuthHeaders(),
             ...options?.headers,
         },
     });

@@ -91,6 +91,12 @@ export const config = {
         // Default rate limit for API keys (can be overridden per-key)
         defaultRateLimit: getEnvNumber('API_KEY_RATE_LIMIT', 1000),
     },
+
+    // Admin authentication
+    admin: {
+        // Secret key for admin access (leave empty to disable auth in development)
+        secret: process.env.ADMIN_SECRET || '',
+    },
 } as const;
 
 export type Config = typeof config;

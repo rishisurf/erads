@@ -1,12 +1,31 @@
 import { Route, Switch } from 'wouter';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import ApiKeys from './pages/ApiKeys';
 import Bans from './pages/Bans';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import Login from './pages/Login';
 
-function App() {
+function AppContent() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white font-mono flex items-center justify-center">
+        <div className="text-xs text-[#888] animate-pulse">INITIALIZING SYSTEM...</div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
+  // Authenticated - show dashboard
   return (
     <Layout>
       <Switch>
@@ -22,6 +41,14 @@ function App() {
         </Route>
       </Switch>
     </Layout>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

@@ -24,6 +24,7 @@ import { getDatabase } from './db';
 import { config } from './config/env';
 import { logger } from './utils/logger';
 import { errorHandler, requestLogger } from './middleware';
+import { requireAdmin, verifyAdminCredentials } from './middleware/auth';
 import { checkRoute, keysRoute, statsRoute, bansRoute, settingsRoute } from './routes';
 
 // Initialize the application
@@ -70,23 +71,45 @@ app.get('/', (c) => {
     name: 'Edge Rate Limiter',
     version: '1.0.0',
     description: 'Rate limiting and abuse detection service',
+    authRequired: !!config.admin.secret,
     endpoints: {
-      check: 'POST /v1/check - Check if a request should be allowed',
-      keys: 'POST /v1/keys - Create/manage API keys',
-      stats: 'GET /v1/stats - Get aggregated statistics',
-      bans: '/v1/bans - Manage bans',
-      settings: '/v1/settings - Manage settings (geo-blocking)',
-      health: 'GET /v1/stats/health - Health check',
+      check: 'POST /v1/check - Check if a request should be allowed (PUBLIC)',
+      auth: 'POST /v1/auth/verify - Verify admin credentials',
+      keys: 'POST /v1/keys - Create/manage API keys (ADMIN)',
+      stats: 'GET /v1/stats - Get aggregated statistics (ADMIN)',
+      bans: '/v1/bans - Manage bans (ADMIN)',
+      settings: '/v1/settings - Manage settings (ADMIN)',
+      health: 'GET /v1/stats/health - Health check (PUBLIC)',
     },
   });
 });
 
 // ============================================================================
+// Authentication
+// ============================================================================
+
+// Auth verification endpoint (public)
+app.post('/v1/auth/verify', verifyAdminCredentials);
+
+// ============================================================================
 // API Routes (v1)
 // ============================================================================
 
-// Mount all routes under /v1
+// PUBLIC: Rate limiting check endpoint (what your apps call)
 app.route('/v1/check', checkRoute);
+
+// PROTECTED: Admin routes require authentication
+// Apply auth middleware to all admin route paths
+app.use('/v1/keys', requireAdmin());
+app.use('/v1/keys/*', requireAdmin());
+app.use('/v1/bans', requireAdmin());
+app.use('/v1/bans/*', requireAdmin());
+app.use('/v1/settings', requireAdmin());
+app.use('/v1/settings/*', requireAdmin());
+app.use('/v1/stats', requireAdmin());
+app.use('/v1/stats/*', requireAdmin());
+
+// Mount admin routes
 app.route('/v1/keys', keysRoute);
 app.route('/v1/stats', statsRoute);
 app.route('/v1/bans', bansRoute);

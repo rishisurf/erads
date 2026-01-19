@@ -170,6 +170,17 @@ export class RequestLogRepository {
       SELECT COUNT(*) as count FROM api_keys WHERE is_active = 1
     `).get() as { count: number };
 
+        // Timeseries: requests per hour for the last 24 hours
+        const timeSeriesRows = this.db.query(`
+      SELECT 
+        strftime('%Y-%m-%dT%H:00:00Z', timestamp) as time_bucket,
+        COUNT(*) as requests
+      FROM request_logs 
+      WHERE timestamp >= datetime('now', '-24 hours')
+      GROUP BY time_bucket
+      ORDER BY time_bucket ASC
+    `).all() as { time_bucket: string; requests: number }[];
+
         return {
             period: {
                 start: startDate,
@@ -189,6 +200,10 @@ export class RequestLogRepository {
             topPaths: topPathsRows.map(row => ({
                 path: row.path,
                 count: row.count,
+            })),
+            timeSeries: timeSeriesRows.map(row => ({
+                time: row.time_bucket,
+                requests: row.requests,
             })),
             activeBans: activeBansResult.count,
             activeApiKeys: activeKeysResult.count,

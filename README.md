@@ -1,109 +1,47 @@
-# Edge Rate-Limiting & Abuse Detection Service (ERADS)
+# ERADS: Edge Rate-Limiting & Abuse Detection Service
 
-A production-grade, centralized security service designed to protect APIs from abuse, manage traffic quotas, and secure sensitive endpoints.
+ERADS is a high-performance, centralized security layer designed to protect modern web applications from brute-force attacks, API abuse, and excessive traffic. Inspired by edge-computing principles, it provides sub-millisecond decision-making with a focus on simplicity and engineering excellence.
 
-![System Status](https://img.shields.io/badge/status-operational-green) ![License](https://img.shields.io/badge/license-MIT-blue)
+## 🚀 Key Features
 
-## ⚡ Use Cases (Why use this?)
+- **Multi-Layer Defense**: Combines IP-based limiting, API Key quotas, and behavior-based burst detection.
+- **Smart Algorithms**: Supports both Fixed Window and Sliding Window algorithms for precise traffic control.
+- **Automated Enforcement**: System-wide automatic temporary bans for IPs exhibiting malicious patterns.
+- **Geo-Blocking**: Enforce access control at the country level using database-driven blocklists.
+- **Brutalist Admin Dashboard**: A high-contrast, technical interface for real-time monitoring and administrative control.
+- **Centralized Management**: Manage security policies for multiple microservices from a single location.
 
-1.  **💰 Protect Expensive AI Routes**
-    *   Prevent users from spamming your OpenAI/LLM endpoints and draining your credits.
-    *   *Example*: Limit free users to 5 requests/minute on expensive generation routes.
+## 🛠 Tech Stack
 
-2.  **🔐 SaaS API Monetization**
-    *   Enforce tiered access limits for your customers.
-    *   *Example*: **Free Tier** (100 req/hour) vs **Pro Tier** (10,000 req/hour) managed via API Keys.
+- **Backend**: Built with [Bun](https://bun.sh) and [Hono](https://hono.dev) for high-concurrency performance.
+- **Storage**: Highly optimized [SQLite](https://sqlite.org) with WAL (Write-Ahead Logging) mode.
+- **Frontend**: [React](https://reactjs.org), [Vite](https://vitejs.dev), and [Tailwind CSS v4](https://tailwindcss.com) following a strict brutalist design aesthetic.
 
-3.  **🛡️ Brute-Force & DDoS Protection**
-    *   Automatically detect and ban IPs that exhibit aggressive behavior (bursts).
-    *   *Example*: Instantly ban an IP for 1 hour if it hits `/login` 20 times in 10 seconds.
+## 📖 Documentation
 
-4.  **🌍 Centralized Traffic Control**
-    *   Manage limits for multiple microservices from a single dashboard.
-    *   Stop abuse at the "edge" before it loads your primary database.
+- **[Installation & Setup (SETUP.md)](./SETUP.md)**: How to get the service running in development and production.
+- **[API Reference (API.md)](./API.md)**: Detailed documentation of all public and administrative endpoints.
+- **[Use Cases](./README.md#⚡-use-cases)**: Examples of how to integrate ERADS into your workflow.
+
+## ⚡ Use Cases
+
+### 1. Cost Protection for AI/LLM Gateways
+Prevent unexpected expenses by limiting users' access to expensive upstream AI APIs. Issue specific API keys to clients with strictly enforced monthly or per-minute budgets.
+
+### 2. Login Brute-Force Shielding
+Protect authenticated routes from credential stuffing. If an IP hits your `/login` endpoint suspiciously fast, ERADS will trigger an automatic 1-hour ban, stopping bots in their tracks.
+
+### 3. SaaS Tenant Isolation
+Ensure no single customer can degrade the performance of your system for others. Use API Key-based limiting to enforce different service tiers (e.g., Free, Pro, Enterprise).
+
+### 4. Anti-Scraping
+Mitigate automated data harvesting by detecting machine-speed request bursts and imposing temporary blocks on crawlers.
+
+## 🛡 Security
+
+Administrative access to the dashboard and management APIs is secured via a protected `ADMIN_SECRET`. The public-facing `/v1/check` endpoint is designed for high-frequency consumption with minimal overhead.
 
 ---
 
-## Overview
-
-This project consists of two main components:
-1.  **Backend**: A high-performance API built with **Bun + Hono + SQLite**. It handles high-speed logic: rate limiting, abuse detection, and token buckets.
-2.  **Frontend**: A strict minimalist/brutalist admin dashboard built with **Vite + React**. It provides full visibility into traffic patterns and control over bans and keys.
-
-## Project Structure
-
-```
-erads/
-├── backend/            # The "Brain" (API)
-│   ├── src/
-│   │   ├── services/   # Burst detection & limiting logic
-│   │   ├── routes/     # Checks, Keys, and Stats endpoints
-│   │   └── db/         # SQLite storage (WAL mode enabled)
-│   └── data/           # Local database file
-│
-└── frontend/           # The "Control Center" (Dashboard)
-    ├── src/
-    │   ├── pages/      # Analytics, Key Management, Live Monitoring
-    │   └── components/ # Reusable brutalist UI elements
-```
-
-## Quick Start
-
-### 1. Start the Backend (Port 3001)
-
-```bash
-cd backend
-bun install
-bun run db:migrate  # Create database tables
-bun run dev         # Start API server
-```
-
-### 2. Start the Dashboard (Port 5173)
-
-```bash
-cd frontend
-bun install
-bun run dev         # Start Admin UI
-```
-
-### 3. Usage
-
-**Check a Request (in your app code):**
-
-```bash
-curl -X POST http://localhost:3001/v1/check \
-  -H "Content-Type: application/json" \
-  -d '{"ip": "1.2.3.4", "apiKey": "optional_key"}'
-```
-
-**Response:**
-```json
-{
-  "allowed": true,
-  "remaining": 99,
-  "resetAt": 1705680000
-}
-```
-
-## Features
-
-### Backend API
-- **High Performance**: Built on Bun for sub-millisecond overhead.
-- **Smart Algorithms**: Supports both *Fixed Window* and *Sliding Window* limiting.
-- **Abuse Detection**: "Trap" logic that detects machine-speed bursts and auto-bans.
-- **Geo-Blocking**: Optional checking of country codes (requires upstream proxy headers).
-
-### Admin Dashboard (Brutalist UI)
-- **Live Analytics**: Monitor blocked vs allowed requests in real-time.
-- **Key Registry**: Create specific API keys with custom quota limits.
-- **Ban Manager**: View auto-banned IPs and manually lift or impose bans.
-- **Traffic Viz**: Visual breakdown of block reasons (Rate Limit vs Abuse vs Manual Ban).
-
-## Tech Stack
-- **Runtime**: Bun
-- **Framework**: Hono (Backend), React (Frontend)
-- **Database**: SQLite
-- **Styling**: TailwindCSS v4 (Brutalist Theme)
-
-## License
-MIT
+Designed with a focus on performance and minimal abstraction.
+MIT Licensed.

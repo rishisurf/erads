@@ -24,6 +24,10 @@ export interface Stats {
         path: string;
         count: number;
     }>;
+    timeSeries: Array<{
+        time: string;
+        requests: number;
+    }>;
     activeBans: number;
     activeApiKeys: number;
 }
