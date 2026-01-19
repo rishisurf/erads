@@ -18,6 +18,7 @@ import {
     BanRepository,
     RequestLogRepository,
 } from '../repositories';
+import { SettingsRepository } from '../repositories/settings';
 import type { CheckRequest, CheckResponse, RateLimitConfig } from '../types';
 
 export class RateLimiterService {
@@ -25,12 +26,14 @@ export class RateLimiterService {
     private rateLimitRepo: RateLimitRepository;
     private banRepo: BanRepository;
     private logRepo: RequestLogRepository;
+    private settingsRepo: SettingsRepository;
 
     constructor() {
         this.apiKeyRepo = new ApiKeyRepository();
         this.rateLimitRepo = new RateLimitRepository();
         this.banRepo = new BanRepository();
         this.logRepo = new RequestLogRepository();
+        this.settingsRepo = new SettingsRepository();
     }
 
     /**
@@ -69,8 +72,9 @@ export class RateLimiterService {
             }
 
             // Step 2: Check geo-blocking (if enabled and country provided)
-            if (config.abuse.geoBlockingEnabled && request.metadata?.country) {
-                if (config.abuse.blockedCountries.includes(request.metadata.country)) {
+            if (request.metadata?.country) {
+                const geoBlockingEnabled = this.settingsRepo.isGeoBlockingEnabled();
+                if (geoBlockingEnabled && this.settingsRepo.isCountryBlocked(request.metadata.country)) {
                     this.logRequest(request, identifier, identifierType, false, 'geo_blocked');
                     return this.createResponse(false, 'geo_blocked', 0, 0);
                 }

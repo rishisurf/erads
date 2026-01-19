@@ -24,7 +24,7 @@ import { getDatabase } from './db';
 import { config } from './config/env';
 import { logger } from './utils/logger';
 import { errorHandler, requestLogger } from './middleware';
-import { checkRoute, keysRoute, statsRoute, bansRoute } from './routes';
+import { checkRoute, keysRoute, statsRoute, bansRoute, settingsRoute } from './routes';
 
 // Initialize the application
 const app = new Hono();
@@ -75,6 +75,7 @@ app.get('/', (c) => {
       keys: 'POST /v1/keys - Create/manage API keys',
       stats: 'GET /v1/stats - Get aggregated statistics',
       bans: '/v1/bans - Manage bans',
+      settings: '/v1/settings - Manage settings (geo-blocking)',
       health: 'GET /v1/stats/health - Health check',
     },
   });
@@ -89,6 +90,7 @@ app.route('/v1/check', checkRoute);
 app.route('/v1/keys', keysRoute);
 app.route('/v1/stats', statsRoute);
 app.route('/v1/bans', bansRoute);
+app.route('/v1/settings', settingsRoute);
 
 // ============================================================================
 // 404 Handler

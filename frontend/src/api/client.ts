@@ -59,4 +59,25 @@ export const api = {
         fetcher<{ success: boolean }>('/bans/' + id, {
             method: 'DELETE',
         }),
+
+    // Settings / Geo-Blocking
+    getGeoBlocking: () =>
+        fetcher<{ enabled: boolean; blockedCountries: Array<{ countryCode: string; countryName: string | null; blockedAt: string }> }>('/settings/geo-blocking'),
+
+    setGeoBlockingEnabled: (enabled: boolean) =>
+        fetcher<{ success: boolean; enabled: boolean }>('/settings/geo-blocking', {
+            method: 'PUT',
+            body: JSON.stringify({ enabled }),
+        }),
+
+    blockCountry: (countryCode: string, countryName?: string) =>
+        fetcher<{ success: boolean; countryCode: string }>('/settings/geo-blocking/countries', {
+            method: 'POST',
+            body: JSON.stringify({ countryCode, countryName }),
+        }),
+
+    unblockCountry: (countryCode: string) =>
+        fetcher<{ success: boolean }>('/settings/geo-blocking/countries/' + countryCode, {
+            method: 'DELETE',
+        }),
 };

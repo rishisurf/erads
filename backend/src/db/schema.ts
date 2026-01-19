@@ -121,26 +121,49 @@ CREATE INDEX IF NOT EXISTS idx_bans_active
   ON bans(identifier, identifier_type, expires_at);
 -- Index for finding expired bans to clean up
 CREATE INDEX IF NOT EXISTS idx_bans_expiry ON bans(expires_at);
+
+-- ============================================================================
+-- Settings Table
+-- ============================================================================
+-- Key-value store for global settings like geo-blocking toggle.
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- ============================================================================
+-- Blocked Countries Table
+-- ============================================================================
+-- Stores list of blocked country codes for geo-blocking.
+CREATE TABLE IF NOT EXISTS blocked_countries (
+  country_code TEXT PRIMARY KEY,         -- ISO 3166-1 alpha-2 code (e.g., 'CN', 'RU')
+  country_name TEXT,                      -- Human-readable name
+  blocked_at TEXT NOT NULL DEFAULT (datetime('now')),
+  blocked_by TEXT NOT NULL DEFAULT 'admin'
+);
+
+CREATE INDEX IF NOT EXISTS idx_blocked_countries_code ON blocked_countries(country_code);
 `;
 
 /**
  * Cleanup queries for maintenance jobs
  */
 export const CLEANUP_QUERIES = {
-    // Remove request logs older than 30 days
-    deleteOldLogs: `
+  // Remove request logs older than 30 days
+  deleteOldLogs: `
     DELETE FROM request_logs 
     WHERE timestamp < datetime('now', '-30 days')
   `,
 
-    // Remove expired rate limit windows
-    deleteExpiredWindows: `
+  // Remove expired rate limit windows
+  deleteExpiredWindows: `
     DELETE FROM rate_limits 
     WHERE window_start < datetime('now', '-1 hour')
   `,
 
-    // Remove expired bans (keep for history, mark as inactive)
-    deleteExpiredBans: `
+  // Remove expired bans (keep for history, mark as inactive)
+  deleteExpiredBans: `
     DELETE FROM bans 
     WHERE expires_at IS NOT NULL 
     AND expires_at < datetime('now')
