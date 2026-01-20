@@ -26,6 +26,7 @@ import { logger } from './utils/logger';
 import { errorHandler, requestLogger } from './middleware';
 import { requireAdmin, verifyAdminCredentials } from './middleware/auth';
 import { checkRoute, keysRoute, statsRoute, bansRoute, settingsRoute } from './routes';
+import { initIPIntel, ipIntelRoutes, shutdownIPIntel } from './ip-intel';
 
 // Initialize the application
 const app = new Hono();
@@ -36,6 +37,10 @@ const app = new Hono();
 // Initialize database before handling any requests
 await getDatabase();
 logger.info('Database initialized');
+
+// Initialize IP Intelligence module
+await initIPIntel();
+logger.info('IP Intelligence module initialized');
 
 // ============================================================================
 // Global Middleware
@@ -80,6 +85,11 @@ app.get('/', (c) => {
       bans: '/v1/bans - Manage bans (ADMIN)',
       settings: '/v1/settings - Manage settings (ADMIN)',
       health: 'GET /v1/stats/health - Health check (PUBLIC)',
+      ipIntel: {
+        check: 'POST /v1/ip/check - Check IP reputation (PUBLIC)',
+        block: 'POST /v1/ip/block - Manually block IP/ASN (ADMIN)',
+        stats: 'GET /v1/ip/stats - IP intel statistics (ADMIN)',
+      },
     },
   });
 });
@@ -114,6 +124,13 @@ app.route('/v1/keys', keysRoute);
 app.route('/v1/stats', statsRoute);
 app.route('/v1/bans', bansRoute);
 app.route('/v1/settings', settingsRoute);
+
+// IP Intelligence routes (check is public, management is admin)
+app.use('/v1/ip/block', requireAdmin());
+app.use('/v1/ip/blocks', requireAdmin());
+app.use('/v1/ip/stats', requireAdmin());
+app.use('/v1/ip/maintenance/*', requireAdmin());
+app.route('/v1/ip', ipIntelRoutes);
 
 // ============================================================================
 // 404 Handler
@@ -156,3 +173,10 @@ export default {
   port: config.server.port,
   fetch: app.fetch,
 };
+
+// Graceful shutdown handler
+process.on('SIGTERM', () => {
+  logger.info('Received SIGTERM, shutting down gracefully');
+  shutdownIPIntel();
+  process.exit(0);
+});

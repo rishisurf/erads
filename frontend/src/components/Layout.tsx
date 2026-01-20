@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Key, BarChart3, ShieldAlert, Cpu, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Key, BarChart3, ShieldAlert, Cpu, Settings, LogOut, Radar } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface LayoutProps {
@@ -15,6 +15,7 @@ export function Layout({ children }: LayoutProps) {
         { href: '/analytics', label: 'Analytics', icon: BarChart3 },
         { href: '/keys', label: 'API Keys', icon: Key },
         { href: '/bans', label: 'Bans', icon: ShieldAlert },
+        { href: '/ip-intel', label: 'IP Intel', icon: Radar },
         { href: '/settings', label: 'Settings', icon: Settings },
     ];
 

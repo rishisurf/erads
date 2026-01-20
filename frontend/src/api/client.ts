@@ -90,4 +90,90 @@ export const api = {
         fetcher<{ success: boolean }>('/settings/geo-blocking/countries/' + countryCode, {
             method: 'DELETE',
         }),
+
+    // IP Intelligence
+    checkIP: (ip: string, bypassCache?: boolean) =>
+        fetcher<IPCheckResult>('/ip/check', {
+            method: 'POST',
+            body: JSON.stringify({ ip, bypassCache }),
+        }),
+
+    getIPBlocks: () =>
+        fetcher<{ count: number; blocks: IPBlock[] }>('/ip/blocks'),
+
+    addIPBlock: (data: { identifier: string; type: 'ip' | 'asn' | 'range'; reason: string; durationSeconds?: number }) =>
+        fetcher<{ success: boolean; identifier: string; type: string }>('/ip/block', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+
+    removeIPBlock: (identifier: string, type: 'ip' | 'asn' | 'range') =>
+        fetcher<{ success: boolean }>(`/ip/block?identifier=${encodeURIComponent(identifier)}&type=${type}`, {
+            method: 'DELETE',
+        }),
+
+    getIPIntelStats: () =>
+        fetcher<IPIntelStats>('/ip/stats'),
+
+    lookupASN: (asn: number | string) =>
+        fetcher<ASNResult>(`/ip/asn/${asn}`),
 };
+
+// IP Intelligence Types
+export interface ASNResult {
+    asn: number;
+    orgName: string;
+    isHosting: boolean;
+    isVPN: boolean;
+    countryCode: string | null;
+    expiresAt: string;
+}
+export interface IPCheckResult {
+    ip: string;
+    isProxy: boolean;
+    isVPN: boolean;
+    isTor: boolean;
+    isHosting: boolean;
+    confidence: number;
+    reason: string;
+    source: 'cache' | 'heuristic' | 'provider' | 'manual' | 'tor_list';
+    asn?: number;
+    asnOrg?: string;
+    countryCode?: string;
+}
+
+export interface IPBlock {
+    identifier: string;
+    type: 'ip' | 'asn' | 'range';
+    reason: string;
+    blockedBy: string;
+    blockedAt: string;
+    expiresAt: string | null;
+    isPermanent: boolean;
+}
+
+export interface IPIntelStats {
+    period: string;
+    totalChecks: number;
+    cacheHits: number;
+    cacheHitRate: string;
+    classifications: {
+        residential: number;
+        proxy: number;
+        vpn: number;
+        tor: number;
+        hosting: number;
+        unknown: number;
+    };
+    manualBlocks: {
+        ips: number;
+        asns: number;
+        ranges: number;
+    };
+    tor: {
+        enabled: boolean;
+        nodeCount: number;
+        lastUpdate: string | null;
+    };
+    asnCacheSize: number;
+}

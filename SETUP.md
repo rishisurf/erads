@@ -18,7 +18,13 @@ bun install
 
 ### Environment Variables
 
-Create a `.env` file in the `backend` directory:
+Prepare your environment by copying the example file:
+
+```bash
+cp .env.example .env
+```
+
+The `.env` file contains:
 
 ```env
 PORT=3001
@@ -60,7 +66,13 @@ bun install
 
 ### Environment Variables
 
-Create a `.env` file in the `frontend` directory:
+Prepare your environment by copying the example file:
+
+```bash
+cp .env.example .env
+```
+
+The `.env` file should include:
 
 ```env
 VITE_API_BASE_URL=http://your-backend-domain:3001/v1

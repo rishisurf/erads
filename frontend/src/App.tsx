@@ -6,6 +6,7 @@ import ApiKeys from './pages/ApiKeys';
 import Bans from './pages/Bans';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import IPIntelligence from './pages/IPIntelligence';
 import Login from './pages/Login';
 
 function AppContent() {
@@ -34,6 +35,7 @@ function AppContent() {
         <Route path="/bans" component={Bans} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/settings" component={Settings} />
+        <Route path="/ip-intel" component={IPIntelligence} />
         <Route>
           <div className="flex h-full items-center justify-center text-[#888]">
             404 | NOT FOUND

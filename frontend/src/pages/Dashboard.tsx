@@ -29,6 +29,7 @@ export default function Dashboard() {
 
     if (loading && !stats) return <div className="text-xs text-[#888] animate-pulse">BOOTING SYSTEM...</div>;
     if (error) return <div className="text-xs text-red-500 border border-red-900 p-4">SYSTEM ERROR: {error}</div>;
+    if (!stats) return <div className="text-xs text-[#888] animate-pulse">LOADING DATA...</div>;
 
     // Format timeseries data for the chart
     const chartData = (stats?.timeSeries || []).map(item => ({
@@ -49,26 +50,26 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     label="Total Requests"
-                    value={stats?.requests.total.toLocaleString() ?? 0}
+                    value={(stats.requests?.total ?? 0).toLocaleString()}
                     subtext="LAST 24H"
                     icon={Activity}
                 />
                 <StatCard
                     label="Blocked"
-                    value={stats?.requests.blocked.toLocaleString() ?? 0}
-                    subtext={`${((stats?.requests.blocked || 0) / (stats?.requests.total || 1) * 100).toFixed(1)}% REJECTION RATE`}
+                    value={(stats.requests?.blocked ?? 0).toLocaleString()}
+                    subtext={`${((stats.requests?.blocked || 0) / (stats.requests?.total || 1) * 100).toFixed(1)}% REJECTION RATE`}
                     className="border-white/20"
                     icon={Shield}
                 />
                 <StatCard
                     label="Active Bans"
-                    value={stats?.activeBans ?? 0}
+                    value={stats.activeBans ?? 0}
                     subtext="CURRENTLY ENFORCED"
                     icon={Server}
                 />
                 <StatCard
                     label="Active Keys"
-                    value={stats?.activeApiKeys ?? 0}
+                    value={stats.activeApiKeys ?? 0}
                     subtext="PROVISIONED"
                     icon={KeyIcon}
                 />
@@ -103,13 +104,13 @@ export default function Dashboard() {
                 <Card>
                     <CardHeader title="ENFORCEMENT" description="BLOCK REASONS" />
                     <div className="space-y-4 mt-6">
-                        {Object.entries(stats?.requests.byReason || {}).map(([reason, count]) => (
+                        {Object.entries(stats.requests?.byReason || {}).map(([reason, count]) => (
                             <div key={reason} className="flex items-center justify-between group cursor-default">
                                 <span className="text-sm text-[#888] font-mono group-hover:text-white transition-colors uppercase">{reason.replace(/_/g, ' ')}</span>
                                 <span className="text-sm font-mono">{count}</span>
                             </div>
                         ))}
-                        {Object.keys(stats?.requests.byReason || {}).length === 0 && (
+                        {Object.keys(stats.requests?.byReason || {}).length === 0 && (
                             <div className="text-sm text-[#444] py-8 text-center italic">NO BLOCKED REQUESTS LOGGED</div>
                         )}
                     </div>
@@ -120,26 +121,26 @@ export default function Dashboard() {
                 <Card>
                     <CardHeader title="TOP IDENTIFIERS" description="MOST ACTIVE CLIENTS" />
                     <div className="space-y-3">
-                        {stats?.topIdentifiers?.slice(0, 5).map((item, i) => (
+                        {stats.topIdentifiers?.slice(0, 5).map((item, i) => (
                             <div key={i} className="flex justify-between items-center text-sm border-b border-[#222] pb-2 last:border-0">
                                 <span className="font-mono text-[#ddd]">{item.identifier}</span>
                                 <span className="text-[#666]">{item.count.toLocaleString()} REQ</span>
                             </div>
                         ))}
-                        {!stats?.topIdentifiers?.length && <div className="text-[#444] text-sm">NO DATA AVAILABLE</div>}
+                        {!stats.topIdentifiers?.length && <div className="text-[#444] text-sm">NO DATA AVAILABLE</div>}
                     </div>
                 </Card>
 
                 <Card>
                     <CardHeader title="TOP PATHS" description="MOST ACCESSED RESOURCES" />
                     <div className="space-y-3">
-                        {stats?.topPaths?.slice(0, 5).map((item, i) => (
+                        {stats.topPaths?.slice(0, 5).map((item, i) => (
                             <div key={i} className="flex justify-between items-center text-sm border-b border-[#222] pb-2 last:border-0">
                                 <span className="font-mono text-[#ddd]">{item.path}</span>
                                 <span className="text-[#666]">{item.count.toLocaleString()} REQ</span>
                             </div>
                         ))}
-                        {!stats?.topPaths?.length && <div className="text-[#444] text-sm">NO DATA AVAILABLE</div>}
+                        {!stats.topPaths?.length && <div className="text-[#444] text-sm">NO DATA AVAILABLE</div>}
                     </div>
                 </Card>
             </div>

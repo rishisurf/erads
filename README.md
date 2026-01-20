@@ -17,6 +17,31 @@ ERADS is a high-performance, centralized security layer designed to protect mode
 - **Storage**: Highly optimized [SQLite](https://sqlite.org) with WAL (Write-Ahead Logging) mode.
 - **Frontend**: [React](https://reactjs.org), [Vite](https://vitejs.dev), and [Tailwind CSS v4](https://tailwindcss.com) following a strict brutalist design aesthetic.
 
+## 🚀 Quick Start
+
+1. **Clone & Install**:
+   ```bash
+   git clone https://github.com/your-repo/erads.git
+   cd erads
+   ```
+
+2. **Backend Setup**:
+   ```bash
+   cd backend
+   cp .env.example .env
+   bun install
+   bun run db:migrate
+   bun run dev
+   ```
+
+3. **Frontend Setup**:
+   ```bash
+   cd ../frontend
+   cp .env.example .env
+   bun install
+   bun run dev
+   ```
+
 ## 📖 Documentation
 
 - **[Installation & Setup (SETUP.md)](./SETUP.md)**: How to get the service running in development and production.
